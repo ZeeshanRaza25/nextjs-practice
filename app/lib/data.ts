@@ -10,6 +10,8 @@ import {
 } from './definitions';
 import { unstable_noStore as noStore } from 'next/cache';
 import { formatCurrency } from './utils';
+import dbConnect from './dbConnect';
+import City from './models/cities';
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -233,5 +235,62 @@ export async function getUser(email: string) {
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
+  }
+}
+
+let LIMIT = 10;
+// Fetch all Cities
+export async function fetchFilteredCities(query: string, currentPage: number) {
+  const offset = (currentPage - 1) * LIMIT;
+
+  let queryObj: any = {};
+  if (query) {
+    queryObj.name = { $regex: query, $options: 'i' };
+  }
+
+  try {
+    await dbConnect();
+
+    const cities = await City.find(queryObj)
+      .sort({
+        createdAt: -1,
+      })
+      .limit(LIMIT)
+      .skip(offset);
+
+    return cities;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch cities.');
+  }
+}
+
+export async function fetchCityById(id: string) {
+  noStore();
+  try {
+    await dbConnect();
+    const city = await City.findById(id);
+    return city;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch City.');
+  }
+}
+
+export async function fetchCitiesPages(query: string) {
+  noStore();
+  try {
+    let queryObj: any = {};
+    if (query) {
+      queryObj.name = { $regex: query, $options: 'i' };
+    }
+
+    await dbConnect();
+    const count = await City.find(queryObj).countDocuments();
+    const totalPages = Math.ceil(Number(count) / LIMIT);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of cities.');
   }
 }
