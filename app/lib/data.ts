@@ -12,6 +12,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { formatCurrency } from './utils';
 import dbConnect from './dbConnect';
 import City from './models/cities';
+import Author from './models/authors';
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -292,5 +293,61 @@ export async function fetchCitiesPages(query: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of cities.');
+  }
+}
+
+// Fetch all Authors
+export async function fetchFilteredAuthors(query: string, currentPage: number) {
+  const offset = (currentPage - 1) * LIMIT;
+
+  let queryObj: any = {};
+  if (query) {
+    queryObj.name = { $regex: query, $options: 'i' };
+  }
+
+  try {
+    await dbConnect();
+
+    const data = await Author.find(queryObj)
+      .sort({
+        createdAt: -1,
+      })
+      .limit(LIMIT)
+      .skip(offset);
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch authors.');
+  }
+}
+
+export async function fetchAuthorById(id: string) {
+  noStore();
+  try {
+    await dbConnect();
+    const data = await Author.findById(id);
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch Author.');
+  }
+}
+
+export async function fetchAuthorsPages(query: string) {
+  noStore();
+  try {
+    let queryObj: any = {};
+    if (query) {
+      queryObj.name = { $regex: query, $options: 'i' };
+    }
+
+    await dbConnect();
+    const count = await Author.find(queryObj).countDocuments();
+    const totalPages = Math.ceil(Number(count) / LIMIT);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of authors.');
   }
 }

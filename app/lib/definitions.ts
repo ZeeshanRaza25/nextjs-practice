@@ -89,5 +89,10 @@ export type InvoiceForm = {
 
 export type City = {
   name: string;
-  _id : string;
+  _id: string;
+};
+
+export type Author = {
+  name: string;
+  _id: string;
 };
