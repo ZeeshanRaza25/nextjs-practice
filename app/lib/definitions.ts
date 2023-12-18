@@ -96,3 +96,8 @@ export type Author = {
   name: string;
   _id: string;
 };
+
+export type Category = {
+  name: string;
+  _id: string;
+};

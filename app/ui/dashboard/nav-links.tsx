@@ -24,6 +24,11 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   {
+    name: 'Categories',
+    href: '/dashboard/categories',
+    icon: DocumentDuplicateIcon,
+  },
+  {
     name: 'Invoices',
     href: '/dashboard/invoices',
     icon: DocumentDuplicateIcon,

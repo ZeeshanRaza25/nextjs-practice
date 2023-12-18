@@ -13,6 +13,7 @@ import { formatCurrency } from './utils';
 import dbConnect from './dbConnect';
 import City from './models/cities';
 import Author from './models/authors';
+import Category from './models/category';
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -349,5 +350,64 @@ export async function fetchAuthorsPages(query: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of authors.');
+  }
+}
+
+// Fetch all Categories
+export async function fetchFilteredCategories(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * LIMIT;
+
+  let queryObj: any = {};
+  if (query) {
+    queryObj.name = { $regex: query, $options: 'i' };
+  }
+
+  try {
+    await dbConnect();
+
+    const data = await Category.find(queryObj)
+      .sort({
+        createdAt: -1,
+      })
+      .limit(LIMIT)
+      .skip(offset);
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch categories.');
+  }
+}
+
+export async function fetchCategoryById(id: string) {
+  noStore();
+  try {
+    await dbConnect();
+    const data = await Category.findById(id);
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch Categories.');
+  }
+}
+
+export async function fetchCategoriesPages(query: string) {
+  noStore();
+  try {
+    let queryObj: any = {};
+    if (query) {
+      queryObj.name = { $regex: query, $options: 'i' };
+    }
+
+    await dbConnect();
+    const count = await Category.find(queryObj).countDocuments();
+    const totalPages = Math.ceil(Number(count) / LIMIT);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of Categories.');
   }
 }
