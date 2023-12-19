@@ -14,6 +14,7 @@ import dbConnect from './dbConnect';
 import City from './models/cities';
 import Author from './models/authors';
 import Category from './models/category';
+import Publisher from './models/publisher';
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -242,6 +243,19 @@ export async function getUser(email: string) {
 
 let LIMIT = 10;
 // Fetch all Cities
+export async function fetchAllCities() {
+  try {
+    await dbConnect();
+
+    const cities = await City.find();
+
+    return cities;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch cities.');
+  }
+}
+
 export async function fetchFilteredCities(query: string, currentPage: number) {
   const offset = (currentPage - 1) * LIMIT;
 
@@ -409,5 +423,83 @@ export async function fetchCategoriesPages(query: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of Categories.');
+  }
+}
+
+// Fetch all Publishers
+export async function fetchFilteredPublishers(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * LIMIT;
+
+  let queryObj: any = {};
+  if (query) {
+    queryObj.name = { $regex: query, $options: 'i' };
+  }
+
+  try {
+    await dbConnect();
+
+    const data = await Publisher.find(queryObj)
+      .populate('city')
+      .sort({
+        createdAt: -1,
+      })
+      .limit(LIMIT)
+      .skip(offset);
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch publishers.');
+  }
+}
+
+export async function fetchPublisherById(id: string) {
+  noStore();
+  try {
+    await dbConnect();
+    let data1 = await Publisher.findById(id).lean(); // Use lean() to get a plain JavaScript object
+    // console.log('data1', data1);
+    // let dataPromise = Publisher.findById(id); // This returns a promise
+    // console.log('dataPromise', dataPromise);
+    // let data = await dataPromise; //
+    // console.log('data', data);
+    const { _id, name, city }: any = data1;
+    return { _id, name, city };
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch publishers.');
+  }
+}
+
+export async function fetchPublishersPages(query: string) {
+  noStore();
+  try {
+    let queryObj: any = {};
+    if (query) {
+      // if (queryObj.name) {
+      //   queryObj.name = { $regex: query, $options: 'i' };
+      // }
+    }
+
+    await dbConnect();
+    const count = await Publisher.find(queryObj).countDocuments();
+    const totalPages = Math.ceil(Number(count) / LIMIT);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of Publishers.');
+  }
+}
+
+export async function fetchPublishers() {
+  try {
+    await dbConnect();
+    const data = await Publisher.find();
+    return data;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all publishers.');
   }
 }

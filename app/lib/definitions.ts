@@ -101,3 +101,9 @@ export type Category = {
   name: string;
   _id: string;
 };
+
+export type Publisher = {
+  _id: string;
+  name: string;
+  city: string;
+};

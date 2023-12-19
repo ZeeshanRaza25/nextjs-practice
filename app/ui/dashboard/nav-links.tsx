@@ -14,6 +14,16 @@ import clsx from 'clsx';
 const links = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
   {
+    name: 'Categories',
+    href: '/dashboard/categories',
+    icon: DocumentDuplicateIcon,
+  },
+  {
+    name: 'Publishers',
+    href: '/dashboard/publishers',
+    icon: DocumentDuplicateIcon,
+  },
+  {
     name: 'Authors',
     href: '/dashboard/authors',
     icon: DocumentDuplicateIcon,
@@ -23,17 +33,12 @@ const links = [
     href: '/dashboard/cities',
     icon: DocumentDuplicateIcon,
   },
-  {
-    name: 'Categories',
-    href: '/dashboard/categories',
-    icon: DocumentDuplicateIcon,
-  },
-  {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
-    icon: DocumentDuplicateIcon,
-  },
-  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  // {
+  //   name: 'Invoices',
+  //   href: '/dashboard/invoices',
+  //   icon: DocumentDuplicateIcon,
+  // },
+  // { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
 ];
 
 export default function NavLinks() {
